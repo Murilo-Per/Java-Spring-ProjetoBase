@@ -4,6 +4,7 @@ import br.com.muriloper.api.domain.UserLogin;
 import br.com.muriloper.api.domain.dto.UserDTO;
 import br.com.muriloper.api.repository.UserRepository;
 import br.com.muriloper.api.service.UserService;
+import br.com.muriloper.api.service.exception.DataIntegratyViolationException;
 import br.com.muriloper.api.service.exception.ObjectNotFoundException;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +29,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserLogin create(UserDTO userLoginDTO) {
+        findByEmail(userLoginDTO);
         return repository.save(mapper.map(userLoginDTO, UserLogin.class));
     }
 
-
+    private void findByEmail(UserDTO obj){
+        Optional<UserLogin> user = repository.findByEmail(obj.getEmail());
+        if (user.isPresent()){
+            throw new DataIntegratyViolationException("Email já cadastrado!");
+        }
+    }
 }

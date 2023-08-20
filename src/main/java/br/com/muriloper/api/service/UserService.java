@@ -6,5 +6,7 @@ import br.com.muriloper.api.domain.dto.UserDTO;
 public interface UserService {
     UserLogin findById(Integer id);
 
-    UserLogin create(UserDTO newUserLogin);
+    UserLogin create(UserDTO obj);
+
+    UserLogin update(UserDTO obj);
 }

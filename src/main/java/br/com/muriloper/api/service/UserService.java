@@ -9,4 +9,6 @@ public interface UserService {
     UserLogin create(UserDTO obj);
 
     UserLogin update(UserDTO obj);
+
+    void delete(Integer id);
 }

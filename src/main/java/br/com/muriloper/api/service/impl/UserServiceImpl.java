@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+import static br.com.muriloper.api.Utils.ApiMessages.EMAIL_EXISTS;
+import static br.com.muriloper.api.Utils.ApiMessages.OBJECT_NOT_FOUND;
+
 @Service
 public class UserServiceImpl implements UserService {
 
@@ -24,26 +27,31 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserLogin findById(Integer id) {
         Optional<UserLogin> obj = repository.findById(id);
-        return obj.orElseThrow(() -> new ObjectNotFoundException("Objeto não encontrado!"));
+        return obj.orElseThrow(() -> new ObjectNotFoundException(OBJECT_NOT_FOUND.getMensagem()));
     }
 
     @Override
     public UserLogin create(UserDTO obj) {
-        findByEmail(obj);
-        return repository.save(mapper.map(obj, UserLogin.class));
+        Optional<UserLogin> user = findByEmail(obj.getEmail());
+
+        if ( user.isPresent() && !user.get().getId().equals(obj.getId())) {
+            throw new DataIntegrityViolationException(EMAIL_EXISTS.getMensagem());
+        } else {
+            return repository.save(mapper.map(obj, UserLogin.class));
+        }
     }
 
-    private void findByEmail(UserDTO obj){
-        Optional<UserLogin> user = repository.findByEmail(obj.getEmail());
-        if (user.isPresent() && !user.get().getId().equals(obj.getId())){
-            throw new DataIntegrityViolationException("Email já cadastrado!");
-        }
+    public Optional<UserLogin> findByEmail(String email){
+        return repository.findByEmail(email);
     }
 
     @Override
     public UserLogin update(UserDTO obj) {
-        findByEmail(obj);
-        return repository.save(mapper.map(obj, UserLogin.class));
+        Optional<UserLogin> user = findByEmail(obj.getEmail());
+
+        if ( user.isPresent() && user.get().getId().equals(obj.getId())) {
+            return repository.save(mapper.map(obj, UserLogin.class));
+        } else throw new DataIntegrityViolationException(OBJECT_NOT_FOUND.getMensagem());
     }
 
     @Override

@@ -11,4 +11,6 @@ public interface UserService {
     UserLogin update(UserDTO obj);
 
     void delete(Integer id);
+
+    Boolean login(UserDTO obj);
 }

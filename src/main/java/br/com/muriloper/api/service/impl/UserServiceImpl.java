@@ -59,4 +59,18 @@ public class UserServiceImpl implements UserService {
         findById(id);
         repository.deleteById(id);
     }
+
+    @Override
+    public Boolean login(UserDTO obj) {
+        Optional<UserLogin> user = findByEmail(obj.getEmail());
+
+        if (user.isEmpty() || !user.get().getEmail().equals(obj.getEmail())
+           || !user.get().getPassword().equals(obj.getPassword())) {
+            throw new DataIntegrityViolationException(OBJECT_NOT_FOUND.getMensagem());
+        } else {
+            return true;
+        }
+    }
+
+
 }
